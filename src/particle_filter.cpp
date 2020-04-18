@@ -73,6 +73,39 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
    *  http://www.cplusplus.com/reference/random/default_random_engine/
    */
 
+   // Noise (Gaussian)
+   //-----------------------------//
+   // Random generator
+   static std::default_random_engine gen;
+   // These create normal (Gaussian) distributions (zero mean)
+   std::vector< std::normal_distribution<double> > dixt_list(3);
+   for (size_t i=0; i < 3; ++i){
+       dixt_list.emplace_back(0.0, std_pos[i]);
+   }
+   //-----------------------------//
+
+   // Prediction + noise
+
+   double wdt = yaw_rate * delta_t;
+   if ( fabs(yaw_rate) < 0.001){
+       // yaw_rate --> 0.0
+       double vdt = velocity * delta_t;
+       for (size_t i=0; i < particles.size(); ++i){
+           particles[i].x += vdt * cos(particles[i].theta) + dixt_list[0];
+           particles[i].y += vdt * sin(particles[i].theta) + dixt_list[1];
+           particles[i].xtheta += wdt + dixt_list[2]; // Since the yaw rate is not exactly zero.
+       }
+   }else{
+       double v_w = velocity/yaw_rate;
+       for (size_t i=0; i < particles.size(); ++i){
+           double theta_1 = particles[i].xtheta + wdt;
+           particles[i].x += v_w * ( sin(theta_1) - sin(particles[i].theta) ) + dixt_list[0];
+           particles[i].y += v_w * ( cos(particles[i].theta) - cos(theta_1) ) + dixt_list[1];
+           particles[i].xtheta = theta_1 + dixt_list[2];
+       }
+   }
+
+
 }
 
 void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
