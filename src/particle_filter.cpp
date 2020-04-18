@@ -34,20 +34,14 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 
   // Random generator
   std::default_random_engine gen;
-  double std_x, std_y, std_theta;  // Standard deviations for x, y, and theta
-
-  // TODO: Set standard deviations for x, y, and theta
-  std_x = std[0]; // m
-  std_y = std[1]; // m
-  std_theta = std[2]; // rad
 
   // These create normal (Gaussian) distributions
-  normal_distribution<double> dist_x(gps_x, std_x);
-  normal_distribution<double> dist_y(gps_y, std_y);
-  normal_distribution<double> dist_theta(theta, std_theta);
+  std::normal_distribution<double> dist_x(x, std[0]);
+  std::normal_distribution<double> dist_y(y, std[1]);
+  std::normal_distribution<double> dist_theta(theta, std[2]);
 
   // Initialize the particles
-  for (size_t i=0; i < num_particles; ++i){
+  for (int i=0; i < num_particles; ++i){
       Particle a_particle;
       // Sample from these normal distributions
       a_particle.x = dist_x(gen);
@@ -57,8 +51,8 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
       particles.push_back(a_particle);
       //
       // Print your samples to the terminal.
-      std::cout << "Sample " << i + 1 << " " << a_particle.x << " " << a_particle.y << " "
-              << a_particle.theta << std::endl;
+      // std::cout << "Sample " << i + 1 << " " << a_particle.x << " " << a_particle.y << " "
+      //         << a_particle.theta << std::endl;
   }
 
   // Initialize. the weight of particles
