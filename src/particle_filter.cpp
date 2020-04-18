@@ -127,6 +127,35 @@ void ParticleFilter::dataAssociation(const vector<LandmarkObs> &predicted,
 
 }
 
+void ParticleFilter::dataAssociation(const Map &map_landmarks,
+                                     vector<LandmarkObs>& observations) {
+  /**
+   * TODO: Find the predicted measurement that is closest to each
+   *   observed measurement and assign the observed measurement to this
+   *   particular landmark.
+   * NOTE: this method will NOT be called by the grading code. But you will
+   *   probably find it useful to implement this method and use it as a helper
+   *   during the updateWeights phase.
+   */
+   // Note: this is actually performed in the vehicle coordinate.
+
+   // For each observation
+   for (size_t j=0; j < observations.size(); ++j){
+       int id_min = -1;
+       double dist_min = -1;
+       // For each landmark, find the id of landmark with minimum distance
+       for (size_t k=0; k < map_landmarks.landmark_list.size(); ++k){
+           double dist_ = dist(observations[j].x, observations[j].y, map_landmarks.landmark_list[k].x_f, map_landmarks.landmark_list[k].y_f);
+           if (dist_ < dist_min || id_min == -1){
+               dist_min = dist_;
+               id_min = k;
+           }
+       }
+       observations[j].id = id_min;
+   }
+   //
+}
+
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
                                    const vector<LandmarkObs> &observations,
                                    const Map &map_landmarks) {
@@ -148,16 +177,17 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
    for (size_t i=0; i < particles.size(); ++i){
        // transformation: from vehicle frame to map frame
        vector<LandmarkObs> observation_map_list;
+       double c_t = cos(particles[i].theta);
+       double s_t = sin(particles[i].theta);
        // For each landmark observed
        for (size_t j=0; j < observations.size(); ++j){
            LandmarkObs an_observation;
-           double c_t = cos(particles[i].theta);
-           double s_t = sin(particles[i].theta);
            an_observation.x = c_t * observations[j].x - s_t * observations[j].y + particles[i].x;
            an_observation.y = s_t * observations[j].x + c_t * observations[j].y + particles[i].y;
            observation_map_list.push_back( an_observation );
        }
        // Association
+       dataAssociation(map_landmarks, observation_map_list);
        // Update weights
    }
 
