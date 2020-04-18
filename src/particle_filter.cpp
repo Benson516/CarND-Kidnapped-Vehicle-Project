@@ -216,7 +216,7 @@ void ParticleFilter::resample() {
    static std::default_random_engine gen;
 
    // Use the member "weights" to contain weights
-   weights.reset(particles.size());
+   weights.resize(particles.size());
    for (size_t i=0; i < weights.size(); ++i){
        weights[i] = particles[i].weight;
    }
@@ -224,7 +224,7 @@ void ParticleFilter::resample() {
    std::discrete_distribution<int> dist_w(weights.begin(), weights.end());
    std::vector<Particle> particles_new;
    for (size_t i=0; i < particles.size(); ++i){
-       particles_new.append( particles[dist_w(gen)] );
+       particles_new.push_back( particles[dist_w(gen)] );
    }
    // Update
    particles = particles_new;
