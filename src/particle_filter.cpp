@@ -199,7 +199,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
            exponent_2 *= exponent_2 / (2.0*std_landmark[1]*std_landmark[1]);
            p_sense *= g_norm_inv*exp( -(exponent_1 + exponent_2) );
        }
-       // weight <-- p_sense 
+       // weight <-- p_sense
        particles[i].weight = p_sense;
    } // end For each particle
 
@@ -212,6 +212,22 @@ void ParticleFilter::resample() {
    * NOTE: You may find std::discrete_distribution helpful here.
    *   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
    */
+   // Random generator
+   static std::default_random_engine gen;
+
+   // Use the member "weights" to contain weights
+   weights.reset(particles.size());
+   for (size_t i=0; i < weights.size(); ++i){
+       weights[i] = particles[i].weight;
+   }
+   // Construct the distribution
+   std::discrete_distribution<int> dist_w(weights.begin(), weights.end());
+   std::vector<Particle> particles_new;
+   for (size_t i=0; i < particles.size(); ++i){
+       particles_new.append( particles[dist_w(gen)] );
+   }
+   // Update
+   particles = particles_new;
 
 }
 
