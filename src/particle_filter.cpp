@@ -113,7 +113,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
 
 }
 
-void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
+void ParticleFilter::dataAssociation(const vector<LandmarkObs> &predicted,
                                      vector<LandmarkObs>& observations) {
   /**
    * TODO: Find the predicted measurement that is closest to each
@@ -123,6 +123,7 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
    *   probably find it useful to implement this method and use it as a helper
    *   during the updateWeights phase.
    */
+   // Note: this is actually performed in the vehicle coordinate.
 
 }
 
@@ -142,6 +143,23 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
    *   and the following is a good resource for the actual equation to implement
    *   (look at equation 3.33) http://planning.cs.uiuc.edu/node99.html
    */
+
+   // For each particle
+   for (size_t i=0; i < particles.size(); ++i){
+       // transformation: from vehicle frame to map frame
+       vector<LandmarkObs> observation_map_list;
+       // For each landmark observed
+       for (size_t j=0; j < observations.size(); ++j){
+           LandmarkObs an_observation;
+           double c_t = cos(particles[i].theta);
+           double s_t = sin(particles[i].theta);
+           an_observation.x = c_t * observations[j].x - s_t * observations[j].y + particles[i].x;
+           an_observation.y = s_t * observations[j].x + c_t * observations[j].y + particles[i].y;
+           observation_map_list.push_back( an_observation );
+       }
+       // Association
+       // Update weights
+   }
 
 }
 
