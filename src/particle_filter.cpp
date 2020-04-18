@@ -104,7 +104,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
        }
    }
 
-   // Add noise (separate the this part for examination the effect of noise)
+   // Add noise (separate the this part for examining the effect of noise)
    for (size_t i=0; i < particles.size(); ++i){
        particles[i].x += dist_list[0](gen);
        particles[i].y += dist_list[1](gen);
@@ -130,7 +130,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
                                    const vector<LandmarkObs> &observations,
                                    const Map &map_landmarks) {
   /**
-   * TODO: Update the weights of each particle using a mult-variate Gaussian
+   * TODO: Update the weights of each particle using a multi-variate Gaussian
    *   distribution. You can read more about this distribution here:
    *   https://en.wikipedia.org/wiki/Multivariate_normal_distribution
    * NOTE: The observations are given in the VEHICLE'S coordinate system.
