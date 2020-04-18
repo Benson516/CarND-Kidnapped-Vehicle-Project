@@ -189,7 +189,19 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
        // Association
        dataAssociation(map_landmarks, observation_map_list);
        // Update weights
-   }
+       double p_sense = 1.0;
+       double g_norm_inv = 1.0/(2.0*M_PI*std_landmark[0]*std_landmark[1]);
+       // For each landmark observed
+       for (size_t j=0; j < observation_map_list.size(); ++j){
+           double exponent_1 = observation_map_list[j].x - map_landmarks.landmark_list[ observation_map_list[j].id ].x_f;
+           double exponent_2 = observation_map_list[j].y - map_landmarks.landmark_list[ observation_map_list[j].id ].y_f;
+           exponent_1 *= exponent_1 / (2.0*std_landmark[0]*std_landmark[0]);
+           exponent_2 *= exponent_2 / (2.0*std_landmark[1]*std_landmark[1]);
+           p_sense *= g_norm_inv*exp( -(exponent_1 + exponent_2) );
+       }
+       // weight <-- p_sense 
+       particles[i].weight = p_sense;
+   } // end For each particle
 
 }
 
