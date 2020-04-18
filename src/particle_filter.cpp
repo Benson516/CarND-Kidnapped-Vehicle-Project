@@ -91,17 +91,17 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
        // yaw_rate --> 0.0
        double vdt = velocity * delta_t;
        for (size_t i=0; i < particles.size(); ++i){
-           particles[i].x += vdt * cos(particles[i].theta) + dixt_list[0];
-           particles[i].y += vdt * sin(particles[i].theta) + dixt_list[1];
-           particles[i].xtheta += wdt + dixt_list[2]; // Since the yaw rate is not exactly zero.
+           particles[i].x += vdt * cos(particles[i].theta) + dixt_list[0](gen);
+           particles[i].y += vdt * sin(particles[i].theta) + dixt_list[1](gen);
+           particles[i].theta += wdt + dixt_list[2](gen); // Since the yaw rate is not exactly zero.
        }
    }else{
        double v_w = velocity/yaw_rate;
        for (size_t i=0; i < particles.size(); ++i){
-           double theta_1 = particles[i].xtheta + wdt;
-           particles[i].x += v_w * ( sin(theta_1) - sin(particles[i].theta) ) + dixt_list[0];
-           particles[i].y += v_w * ( cos(particles[i].theta) - cos(theta_1) ) + dixt_list[1];
-           particles[i].xtheta = theta_1 + dixt_list[2];
+           double theta_1 = particles[i].theta + wdt;
+           particles[i].x += v_w * ( sin(theta_1) - sin(particles[i].theta) ) + dixt_list[0](gen);
+           particles[i].y += v_w * ( cos(particles[i].theta) - cos(theta_1) ) + dixt_list[1](gen);
+           particles[i].theta = theta_1 + dixt_list[2](gen);
        }
    }
 
