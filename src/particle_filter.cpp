@@ -78,33 +78,38 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
    // Random generator
    static std::default_random_engine gen;
    // These create normal (Gaussian) distributions (zero mean)
-   std::vector< std::normal_distribution<double> > dixt_list(3);
+   std::vector< std::normal_distribution<double> > dist_list(3);
    for (size_t i=0; i < 3; ++i){
-       dixt_list.emplace_back(0.0, std_pos[i]);
+       dist_list.emplace_back(0.0, std_pos[i]);
    }
    //-----------------------------//
 
    // Prediction + noise
-
    double wdt = yaw_rate * delta_t;
    if ( fabs(yaw_rate) < 0.001){
        // yaw_rate --> 0.0
        double vdt = velocity * delta_t;
        for (size_t i=0; i < particles.size(); ++i){
-           particles[i].x += vdt * cos(particles[i].theta) + dixt_list[0](gen);
-           particles[i].y += vdt * sin(particles[i].theta) + dixt_list[1](gen);
-           particles[i].theta += wdt + dixt_list[2](gen); // Since the yaw rate is not exactly zero.
+           particles[i].x += vdt * cos(particles[i].theta); // + dist_list[0](gen);
+           particles[i].y += vdt * sin(particles[i].theta); // + dist_list[1](gen);
+           particles[i].theta += wdt; //  + dist_list[2](gen); // Since the yaw rate is not exactly zero.
        }
    }else{
        double v_w = velocity/yaw_rate;
        for (size_t i=0; i < particles.size(); ++i){
            double theta_1 = particles[i].theta + wdt;
-           particles[i].x += v_w * ( sin(theta_1) - sin(particles[i].theta) ) + dixt_list[0](gen);
-           particles[i].y += v_w * ( cos(particles[i].theta) - cos(theta_1) ) + dixt_list[1](gen);
-           particles[i].theta = theta_1 + dixt_list[2](gen);
+           particles[i].x += v_w * ( sin(theta_1) - sin(particles[i].theta) ); // + dist_list[0](gen);
+           particles[i].y += v_w * ( cos(particles[i].theta) - cos(theta_1) ); // + dist_list[1](gen);
+           particles[i].theta = theta_1; // + dist_list[2](gen);
        }
    }
 
+   // Add noise
+   for (size_t i=0; i < particles.size(); ++i){
+       particles[i].x += dist_list[0](gen);
+       particles[i].y += dist_list[1](gen);
+       particles[i].theta += dist_list[2](gen);
+   }
 
 }
 
