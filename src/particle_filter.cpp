@@ -104,7 +104,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
        }
    }
 
-   // Add noise
+   // Add noise (separate the this part for examination the effect of noise)
    for (size_t i=0; i < particles.size(); ++i){
        particles[i].x += dist_list[0](gen);
        particles[i].y += dist_list[1](gen);
